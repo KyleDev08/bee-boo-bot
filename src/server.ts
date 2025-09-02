@@ -7,7 +7,7 @@ const server = fastify({
 const PORT = process.env.PORT || 3000;
 
 server.get("/", async (request, reply) => {
-  return { hello: "world" };
+  reply.send({ message: "Bot is running!" });
 });
 
 server.listen({ port: PORT }, (err, address) => {
