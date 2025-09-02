@@ -1,0 +1,21 @@
+import { PermissionResolvable } from "discord.js";
+
+export const REQUIRED_PERMISSIONS: PermissionResolvable[] = [
+  "SendMessages",
+  "EmbedLinks",
+  "ViewChannel",
+  "Speak",
+  "ViewAuditLog",
+  "ReadMessageHistory",
+  "ManageMessages",
+  "ManageChannels",
+  "ManageRoles",
+  "UseExternalEmojis",
+  "UseApplicationCommands",
+  "AddReactions",
+  "Connect",
+  "MuteMembers",
+  "DeafenMembers",
+  "MoveMembers",
+  "ModerateMembers",
+];

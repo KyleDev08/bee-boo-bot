@@ -1,0 +1,27 @@
+{
+  "name": "panther",
+  "version": "1.0.0",
+  "description": "a multi proportional bot",
+  "type": "module",
+  "main": "index.js",
+  "author": "linx08",
+  "license": "AGPL-3.0-only",
+  "private": false,
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "compile": "yarn tsc",
+    "start": "yarn compile && node dist/index.js"
+  },
+  "dependencies": {
+    "@types/node": "^24.3.0",
+    "discord.js": "^14.21.0",
+    "mongoose": "^8.18.0"
+  },
+  "devDependencies": {
+    "dotenv": "^17.2.1",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.20.4",
+    "typescript": "^5.9.2"
+  }
+}
