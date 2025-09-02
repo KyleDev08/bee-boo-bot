@@ -10,7 +10,7 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
-    "start": "yarn build && node dist/index.js"
+    "start": "npn build && node dist/index.js"
   },
   "dependencies": {
     "@types/node": "^24.3.0",
