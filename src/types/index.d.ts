@@ -19,6 +19,7 @@ declare global {
       PREFIX: string;
       MONGO_USER: string;
       MONGO_PASSWORD: string;
+      PORT: number
     }
   }
 }
