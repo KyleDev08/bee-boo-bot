@@ -6,7 +6,7 @@ const PORT = process.env.PORT || 3000;
 server.get("/", async (request, reply) => {
     reply.send({ message: "Bot is running!" });
 });
-server.listen({ port: PORT }, (err, address) => {
+server.listen({ port: PORT, host: "0.0.0.0" }, (err, address) => {
     if (err) {
         server.log.error(err);
         process.exit(1);
