@@ -8,6 +8,7 @@ interface Command {
 declare module "discord.js" {
   interface Client {
     commands: Collection<string, Command>;
+    prefix: string;
   }
 }
 

@@ -4,6 +4,7 @@ import {
   checkBotPermissionsInChannel,
   checkBotPermissionsInGuild,
 } from "../functions/checkPermissions.js";
+import { app } from "../index.js";
 
 let prefix: string;
 
@@ -17,6 +18,8 @@ export default {
       guildId: message.guild?.id,
     });
     prefix = findPrefix ? findPrefix.prefix : process.env.PREFIX;
+
+    app.prefix = prefix;
 
     if (message.mentions.has(message.client.user)) {
       if (!message.guild) return;
@@ -38,6 +41,7 @@ export default {
           return;
         }
       }
+      return message.reply(`My prefix in this server is \`${prefix}\``);
     }
 
     if (!message.content.startsWith(prefix!)) return;

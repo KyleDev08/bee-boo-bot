@@ -172,6 +172,18 @@ export default {
       }
     }
 
+    if (interaction.isAutocomplete()) {
+      const command = interaction.client.commands.get(interaction.commandName);
+      try {
+        if (command && command.autocomplete) {
+          await command.autocomplete(interaction);
+        }
+      } catch (err) {
+        console.error("Error en autocompletado:", err);
+      }
+      return;
+    }
+
     if (
       !interaction.isChatInputCommand() &&
       !interaction.isUserContextMenuCommand() &&
