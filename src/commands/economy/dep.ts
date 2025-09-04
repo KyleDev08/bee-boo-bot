@@ -1,11 +1,13 @@
 import {
   ChatInputCommandInteraction,
+  GuildBasedChannel,
   GuildMember,
   InteractionContextType,
   MessageFlags,
   SlashCommandBuilder,
 } from "discord.js";
-import { economyManager,  getGlobalUser } from "../../utils/economy.js";
+import { economyManager, getGlobalUser } from "../../utils/economy.js";
+import { checkBotPermissionsInChannel } from "../../functions/checkPermissions.js";
 
 export default {
   data: new SlashCommandBuilder()
@@ -37,6 +39,20 @@ export default {
     )
     .setContexts(InteractionContextType.Guild),
   async execute(interaction: ChatInputCommandInteraction) {
+    const missingPermissions = await checkBotPermissionsInChannel(
+      interaction.channel as GuildBasedChannel
+    );
+
+    if (missingPermissions.length > 0) {
+      await interaction.reply({
+        content: `No tengo los permisos necesarios para ejecutar este comando. Me faltan los siguientes permisos: ${missingPermissions
+          .map((p) => `\`${p}\``)
+          .join(", ")}`,
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
+
     const userId = interaction.user.id;
     const user = await economyManager.getServerUser(
       interaction.guild!.id,

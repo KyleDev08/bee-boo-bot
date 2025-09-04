@@ -1,5 +1,6 @@
-import { GuildMember, Message } from "discord.js";
+import { GuildBasedChannel, GuildMember, Message } from "discord.js";
 import { economyManager, getGlobalUser } from "../../utils/economy.js";
+import { checkBotPermissionsInChannel } from "../../functions/checkPermissions.js";
 
 export default {
   data: {
@@ -9,6 +10,19 @@ export default {
   },
   type: "prefix",
   async execute(message: Message, args: string[]) {
+    const missingPermissions = await checkBotPermissionsInChannel(
+      message.channel as GuildBasedChannel
+    );
+
+    if (missingPermissions.length > 0) {
+      await message.reply({
+        content: `No tengo los permisos necesarios para ejecutar este comando. Me faltan los siguientes permisos: ${missingPermissions
+          .map((p) => `\`${p}\``)
+          .join(", ")}`,
+      });
+      return;
+    }
+
     const user = await economyManager.getServerUser(
       message.guild!.id,
       message.author.id

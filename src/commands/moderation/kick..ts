@@ -5,6 +5,7 @@ import {
   ApplicationCommandType,
   ContextMenuCommandBuilder,
   GuildMember,
+  GuildBasedChannel,
 } from "discord.js";
 import { CommandContext } from "../../types/commands.js";
 import {
@@ -12,6 +13,7 @@ import {
   isMessage,
   isUserContextMenuCommand,
 } from "../../functions/verifycommands.js";
+import { checkBotPermissionsInChannel } from "../../functions/checkPermissions.js";
 
 async function executedKick(ctx: CommandContext, args: string[]) {
   if (isMessage(ctx)) {
@@ -21,8 +23,89 @@ async function executedKick(ctx: CommandContext, args: string[]) {
         content: "Debes mencionar al usuario o dar su ID.",
       });
     }
+
+    const user = await ctx.client.users.fetch(userId).catch(() => null);
+    if (!user) {
+      return ctx.reply({
+        content: "No se ha encontrado al usuario.",
+      });
+    }
+    const missingPermissions = await checkBotPermissionsInChannel(
+      ctx.channel as GuildBasedChannel
+    );
+    if (missingPermissions.length > 0) {
+      await ctx.reply({
+        content: `No tengo los permisos necesarios para ejecutar este comando. Me faltan los siguientes permisos: ${missingPermissions
+          .map((p) => `\`${p}\``)
+          .join(", ")}`,
+      });
+      return;
+    }
+
+    const botMember = await ctx.guild?.members.fetchMe();
+    if (!botMember?.permissions.has("KickMembers")) {
+      return await ctx.reply({
+        content: "No tengo permisos para expulsar miembros.",
+      });
+    }
+    if (user.id === ctx.author.id) {
+      return await ctx.reply({
+        content: "No puedes expulsarte a ti mismo.",
+      });
+    }
+    if (user.id === ctx.client.user?.id) {
+      return await ctx.reply({
+        content: "No puedo expulsarme a mí mismo.",
+      });
+    }
+
+    if (user.id === ctx.guild?.ownerId) {
+      return await ctx.reply({
+        content: "No puedes expulsar al dueño del servidor.",
+      });
+    }
+
+    let member: GuildMember | null = null;
+    try {
+      member = (await ctx.guild?.members.fetch(user.id)) ?? null;
+    } catch {
+      member = null;
+    }
+    if (!member) {
+      return await ctx.reply({
+        content: "El usuario no está en el servidor.",
+      });
+    }
+    if (member.roles.highest.position >= botMember.roles.highest.position) {
+      return await ctx.reply({
+        content:
+          "No puedo expulsar a este usuario porque tiene un rol igual o superior al mío.",
+      });
+    }
+    const reason = args.slice(1).join(" ") || "No especificada";
+
+    member.kick(reason).then(() => {
+      ctx.reply({
+        content: `Expulsado ${user.tag} del servidor.\nRazón: ${reason}`,
+      });
+    });
   }
+
   if (isChatInputCommand(ctx) || isUserContextMenuCommand(ctx)) {
+    const missingPermissions = await checkBotPermissionsInChannel(
+      ctx.channel as GuildBasedChannel
+    );
+
+    if (missingPermissions.length > 0) {
+      await ctx.reply({
+        content: `No tengo los permisos necesarios para ejecutar este comando. Me faltan los siguientes permisos: ${missingPermissions
+          .map((p) => `\`${p}\``)
+          .join(", ")}`,
+        flags: ctxResponseFlags.Ephemeral,
+      });
+      return;
+    }
+
     const user = ctx.options.getUser("user");
     if (!user) {
       return await ctx.reply({

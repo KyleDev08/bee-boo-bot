@@ -4,6 +4,7 @@ import {
   MessageFlags as ctxResponseFlags,
   ApplicationCommandType,
   ContextMenuCommandBuilder,
+  GuildBasedChannel,
 } from "discord.js";
 import { CommandContext } from "../../types/commands.js";
 import {
@@ -11,9 +12,23 @@ import {
   isMessage,
   isUserContextMenuCommand,
 } from "../../functions/verifycommands.js";
+import { checkBotPermissionsInChannel } from "../../functions/checkPermissions.js";
 
 async function executedBan(ctx: CommandContext, args: string[]) {
   if (isMessage(ctx)) {
+    const missingPermissions = await checkBotPermissionsInChannel(
+      ctx.channel as GuildBasedChannel
+    );
+
+    if (missingPermissions.length > 0) {
+      await ctx.reply({
+        content: `No tengo los permisos necesarios para ejecutar este comando. Me faltan los siguientes permisos: ${missingPermissions
+          .map((p) => `\`${p}\``)
+          .join(", ")}`,
+      });
+      return;
+    }
+
     const userId = args[0]?.replace(/[<@!>]/g, "");
     if (!userId) {
       return ctx.reply({
@@ -73,6 +88,20 @@ async function executedBan(ctx: CommandContext, args: string[]) {
   }
 
   if (isChatInputCommand(ctx) || isUserContextMenuCommand(ctx)) {
+    const missingPermissions = await checkBotPermissionsInChannel(
+      ctx.channel as GuildBasedChannel
+    );
+
+    if (missingPermissions.length > 0) {
+      await ctx.reply({
+        content: `No tengo los permisos necesarios para ejecutar este comando. Me faltan los siguientes permisos: ${missingPermissions
+          .map((p) => `\`${p}\``)
+          .join(", ")}`,
+        flags: ctxResponseFlags.Ephemeral,
+      });
+      return;
+    }
+
     const user = ctx.isContextMenuCommand()
       ? ctx.targetUser
       : ctx.options.getUser("user");

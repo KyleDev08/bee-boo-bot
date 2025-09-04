@@ -1,8 +1,4 @@
-import {
-  EmbedBuilder,
-  GuildBasedChannel,
-  Message,
-} from "discord.js";
+import { EmbedBuilder, GuildBasedChannel, Message } from "discord.js";
 import { shopGuild } from "../../models/economy.js";
 import { checkBotPermissionsInChannel } from "../../functions/checkPermissions.js";
 
@@ -14,16 +10,17 @@ export default {
   },
   type: "prefix",
   async execute(message: Message) {
-    const missingPerms = await checkBotPermissionsInChannel(
+    const missingPermissions = await checkBotPermissionsInChannel(
       message.channel as GuildBasedChannel
     );
 
-    if (missingPerms.length > 0) {
-      return message.reply(
-        `I am missing the following permissions in this channel: ${missingPerms
-          .map((perm) => `\`${perm}\``)
-          .join(", ")}`
-      );
+    if (missingPermissions.length > 0) {
+      await message.reply({
+        content: `No tengo los permisos necesarios para ejecutar este comando. Me faltan los siguientes permisos: ${missingPermissions
+          .map((p) => `\`${p}\``)
+          .join(", ")}`,
+      });
+      return;
     }
 
     const shop = await shopGuild.findOne({ guildId: message.guildId! });

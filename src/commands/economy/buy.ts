@@ -1,6 +1,7 @@
 import {
   AutocompleteInteraction,
   ChatInputCommandInteraction,
+  GuildBasedChannel,
   GuildMember,
   GuildMemberRoleManager,
   InteractionContextType,
@@ -10,6 +11,7 @@ import {
 import { economyManager, getGlobalUser } from "../../utils/economy.js";
 import { shopGuild } from "../../models/economy.js";
 import { shopItem } from "../../interface/economy.js";
+import { checkBotPermissionsInChannel } from "../../functions/checkPermissions.js";
 
 export default {
   data: new SlashCommandBuilder()
@@ -28,6 +30,20 @@ export default {
     const guildId = interaction.guild!.id;
     const member = interaction.member as GuildMember;
     const userId = member.user.id;
+
+    const missingPermissions = await checkBotPermissionsInChannel(
+      interaction.channel as GuildBasedChannel
+    );
+
+    if (missingPermissions.length > 0) {
+      await interaction.reply({
+        content: `No tengo los permisos necesarios para ejecutar este comando. Me faltan los siguientes permisos: ${missingPermissions
+          .map((p) => `\`${p}\``)
+          .join(", ")}`,
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
 
     const shop = await shopGuild.findOne({ guildId });
     if (!shop || shop.items.length === 0) {
@@ -100,7 +116,7 @@ export default {
 
     const filtered = shop.items
       .filter((i) => i.name.toLowerCase().includes(focused.toLowerCase()))
-      .slice(0, 25); // Discord solo permite 25 sugerencias
+      .slice(0, 25);
 
     return interaction.respond(
       filtered.map((i) => ({
