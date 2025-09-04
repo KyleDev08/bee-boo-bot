@@ -45,23 +45,13 @@ export async function checkBotPermissionsInChannel(
   if (!("permissionsFor" in channel))
     return ["⚠️ Este tipo de canal no soporta permisos."];
 
-  let requiredPermissions = REQUIRED_PERMISSIONS.slice();
-  if (channel.type === ChannelType.GuildText) {
-    requiredPermissions = requiredPermissions.filter(
-      (perm) =>
-        perm !== PermissionsBitField.Flags.Connect &&
-        perm !== PermissionsBitField.Flags.Speak
-    );
-  } else if (channel.type === ChannelType.GuildVoice) {
-    requiredPermissions = requiredPermissions.filter(
-      (perm) => perm !== PermissionsBitField.Flags.SendMessages
-    );
-  } else {
-    return ["⚠️ Este tipo de canal no es de texto ni de voz."];
-  }
+  const allowedPermissions = REQUIRED_PERMISSIONS.filter((perm) =>
+    channel.permissionsFor(botMember)?.has(perm, true)
+  );
 
   const missing =
-    channel.permissionsFor(botMember)?.missing(requiredPermissions) || [];
+    channel.permissionsFor(botMember)?.missing(allowedPermissions) || [];
+
   return missing;
 }
 

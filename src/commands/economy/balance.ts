@@ -28,12 +28,13 @@ export default {
     );
 
     if (missingPermissions.length > 0) {
-      return interaction.reply({
+      await interaction.reply({
         content: `No tengo los permisos necesarios para ejecutar este comando. Me faltan los siguientes permisos: ${missingPermissions
           .map((p) => `\`${p}\``)
           .join(", ")}`,
         flags: MessageFlags.Ephemeral,
       });
+      return;
     }
 
     const targetUser: User =
