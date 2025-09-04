@@ -42,22 +42,20 @@ export async function checkBotPermissionsInChannel(
   const botMember = await channel.guild.members.fetchMe().catch(() => null);
   if (!botMember) return ["❌ No se encontró al bot en este servidor."];
 
-  if (!("permissionsFor" in channel)) {
+  if (!("permissionsFor" in channel))
     return ["⚠️ Este tipo de canal no soporta permisos."];
-  }
 
-  let requiredPermissions: bigint[] = [];
+  let requiredPermissions = REQUIRED_PERMISSIONS.slice();
   if (channel.type === ChannelType.GuildText) {
-    requiredPermissions = [
-      PermissionsBitField.Flags.ViewChannel,
-      PermissionsBitField.Flags.SendMessages,
-    ];
+    requiredPermissions = requiredPermissions.filter(
+      (perm) =>
+        perm !== PermissionsBitField.Flags.Connect &&
+        perm !== PermissionsBitField.Flags.Speak
+    );
   } else if (channel.type === ChannelType.GuildVoice) {
-    requiredPermissions = [
-      PermissionsBitField.Flags.ViewChannel,
-      PermissionsBitField.Flags.Connect,
-      PermissionsBitField.Flags.Speak,
-    ];
+    requiredPermissions = requiredPermissions.filter(
+      (perm) => perm !== PermissionsBitField.Flags.SendMessages
+    );
   } else {
     return ["⚠️ Este tipo de canal no es de texto ni de voz."];
   }
