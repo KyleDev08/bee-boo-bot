@@ -1,9 +1,11 @@
 import {
   CategoryChannel,
+  ChannelType,
   Client,
   Guild,
   GuildBasedChannel,
   NonThreadGuildBasedChannel,
+  PermissionsBitField,
 } from "discord.js";
 import { REQUIRED_PERMISSIONS } from "../types/permissions.js";
 
@@ -44,8 +46,24 @@ export async function checkBotPermissionsInChannel(
     return ["⚠️ Este tipo de canal no soporta permisos."];
   }
 
+  let requiredPermissions: bigint[] = [];
+  if (channel.type === ChannelType.GuildText) {
+    requiredPermissions = [
+      PermissionsBitField.Flags.ViewChannel,
+      PermissionsBitField.Flags.SendMessages,
+    ];
+  } else if (channel.type === ChannelType.GuildVoice) {
+    requiredPermissions = [
+      PermissionsBitField.Flags.ViewChannel,
+      PermissionsBitField.Flags.Connect,
+      PermissionsBitField.Flags.Speak,
+    ];
+  } else {
+    return ["⚠️ Este tipo de canal no es de texto ni de voz."];
+  }
+
   const missing =
-    channel.permissionsFor(botMember)?.missing(REQUIRED_PERMISSIONS) || [];
+    channel.permissionsFor(botMember)?.missing(requiredPermissions) || [];
   return missing;
 }
 
