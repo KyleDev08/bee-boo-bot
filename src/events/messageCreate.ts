@@ -50,18 +50,28 @@ export default {
 
     if (!command) return;
 
-    const cmd = message.client.commands.get(command);
-    if (!cmd?.execute) return;
+    const commands = message.client.commands.get(command);
+    if (!commands) return;
 
-    if (cmd.data.context === "GUILD_ONLY") {
+    const prefixCmd = Array.isArray(commands)
+      ? commands.find((c) => c.type === "prefix")
+      : commands;
+
+    if (!prefixCmd) return;
+
+    if (prefixCmd.data.context === "GUILD_ONLY") {
       if (!message.guild) {
         return message.reply("This command can only be used in a server.");
       }
     }
 
-    if (cmd.data.defaultMemberPermissions) {
+    if (prefixCmd.data.defaultMemberPermissions) {
       const member = await message.guild?.members.fetch(message.author.id);
-      if (!member?.permissions.has(BigInt(cmd.data.defaultMemberPermissions))) {
+      if (
+        !member?.permissions.has(
+          BigInt(prefixCmd.data.defaultMemberPermissions)
+        )
+      ) {
         return message.reply("You don't have permission to use this command.");
       }
     }
@@ -85,7 +95,7 @@ export default {
     }
 
     try {
-      await cmd.execute(message, args);
+      await prefixCmd.execute(message, args);
     } catch (error) {
       console.error(error);
       await message.reply("There was an error while executing this command!");

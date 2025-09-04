@@ -1,5 +1,5 @@
 import { GuildMember, Message } from "discord.js";
-import economyManager, { getGlobalUser } from "../../utils/economy.js";
+import { economyManager, getGlobalUser } from "../../utils/economy.js";
 
 export default {
   data: {

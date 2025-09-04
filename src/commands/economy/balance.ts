@@ -7,7 +7,7 @@ import {
   SlashCommandBuilder,
   User,
 } from "discord.js";
-import economyManager, { getGlobalUser } from "../../utils/economy.js";
+import { economyManager, getGlobalUser } from "../../utils/economy.js";
 import { checkBotPermissionsInChannel } from "../../functions/checkPermissions.js";
 
 export default {
@@ -21,6 +21,7 @@ export default {
         .setRequired(false)
     )
     .setContexts(InteractionContextType.Guild),
+  type: "slash",
   async execute(interaction: ChatInputCommandInteraction) {
     const missingPermissions = await checkBotPermissionsInChannel(
       interaction.channel as GuildBasedChannel

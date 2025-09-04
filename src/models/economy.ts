@@ -29,7 +29,7 @@ export const serverEconomy = model(
     dailyCooldown: { type: Number, default: undefined },
     limitWork: { type: Number, default: 0 },
     workCooldown: { type: Number, default: null },
-    repCooldown: { type: Date, default: null },
+    robCooldown: { type: Date, default: null },
   }).index({ guildId: 1, userId: 1 }, { unique: true })
 );
 

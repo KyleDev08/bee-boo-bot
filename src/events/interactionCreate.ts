@@ -173,10 +173,17 @@ export default {
     }
 
     if (interaction.isAutocomplete()) {
-      const command = interaction.client.commands.get(interaction.commandName);
+      const commands = interaction.client.commands.get(interaction.commandName);
+
+      if (!commands) return;
+
+      const slashCmd = Array.isArray(commands)
+        ? commands.find((c) => c.type === "slash")
+        : commands;
+
       try {
-        if (command && command.autocomplete) {
-          await command.autocomplete(interaction);
+        if (slashCmd && slashCmd.autocomplete) {
+          await slashCmd.autocomplete(interaction);
         }
       } catch (err) {
         console.error("Error en autocompletado:", err);
@@ -210,16 +217,22 @@ export default {
       return;
     }
 
-    const command = interaction.client.commands.get(interaction.commandName);
-    if (!command?.execute) {
+    const commands = interaction.client.commands.get(interaction.commandName);
+    if (!commands) {
       console.error(
         `No command matching ${interaction.commandName} was found.`
       );
       return;
     }
 
+    const slashCmd = Array.isArray(commands)
+      ? commands.find((c) => c.type === "slash")
+      : commands;
+
+    if (!slashCmd) return;
+
     try {
-      await command.execute(interaction);
+      await slashCmd.execute(interaction);
     } catch (error) {
       console.error(error);
       if (interaction.replied || interaction.deferred) {

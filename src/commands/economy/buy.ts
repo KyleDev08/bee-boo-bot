@@ -7,7 +7,7 @@ import {
   MessageFlags,
   SlashCommandBuilder,
 } from "discord.js";
-import economyManager, { getGlobalUser } from "../../utils/economy.js";
+import { economyManager, getGlobalUser } from "../../utils/economy.js";
 import { shopGuild } from "../../models/economy.js";
 import { shopItem } from "../../interface/economy.js";
 

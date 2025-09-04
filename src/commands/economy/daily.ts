@@ -1,5 +1,5 @@
 import { Message } from "discord.js";
-import economyManager from "../../utils/economy.js";
+import {economyManager} from "../../utils/economy.js";
 
 export default {
   data: {

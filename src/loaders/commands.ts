@@ -44,19 +44,23 @@ export async function loadCommands() {
 
       if (!Array.isArray(commandOrCommands)) {
         if ("data" in commandOrCommands && "execute" in commandOrCommands) {
-          app.commands.set(commandOrCommands.data.name, commandOrCommands);
+          if (!app.commands.has(commandOrCommands.data.name)) {
+            app.commands.set(commandOrCommands.data.name, []);
+          }
+          app.commands.get(commandOrCommands.data.name).push(commandOrCommands);
+
           if (typeof commandOrCommands.data.toJSON === "function") {
             commands.push(commandOrCommands.data.toJSON());
           }
-        } else {
-          console.error(
-            `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
-          );
         }
       } else {
         for (const command of commandOrCommands) {
           if ("data" in command && "execute" in command) {
-            app.commands.set(command.data.name, command);
+            if (!app.commands.has(command.data.name)) {
+              app.commands.set(command.data.name, []);
+            }
+            app.commands.get(command.data.name).push(command);
+
             if (typeof command.data.toJSON === "function") {
               commands.push(command.data.toJSON());
             }

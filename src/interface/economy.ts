@@ -18,10 +18,10 @@ export interface EconomyGuild extends Document {
   balance: number;
   bank: number;
   inventory: inventoryItem[];
-  dailyCooldown?: number | undefined ;
+  dailyCooldown?: number | undefined;
   limitWork: number;
   workCooldown?: number;
-  repCooldown?: Date;
+  robCooldown?: number;
 }
 
 export interface GlobalEconomy extends Document {

@@ -2,7 +2,7 @@ import { GuildMember } from "discord.js";
 import { EconomyGuild, inventoryItem } from "../interface/economy.js";
 import { globalEconomy, serverEconomy } from "../models/economy.js";
 
-const economyManager = {
+export const economyManager = {
   getServerUser: async (
     guildId: string,
     userId: string
@@ -37,8 +37,6 @@ const economyManager = {
     return user;
   },
 };
-
-export default economyManager;
 
 function addOrUpdateInventory(
   inventory: inventoryItem[],
